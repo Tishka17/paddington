@@ -1,7 +1,7 @@
 import logging
 
 from paddington import (
-    Context, ErrorTypeSwitch, TypeSwitch, RouteNotFound, SequentialSwitch,
+    Context, ErrorTypeSwitch, TypeSwitch, RouteNotFound, SequentialSwitch, Tie,
 )
 
 error_type_switch = ErrorTypeSwitch()
@@ -34,6 +34,12 @@ def handle_str(event, context):
     raise ValueError
 
 
+def inner_middleware(event, context):
+    print("    inner_middleware", event, context)
+
+
+tie = Tie(event_type_switch, inner_middleware)
+
 root_switch = SequentialSwitch(error_switch=suppress_route_not_found)
 
 
@@ -42,15 +48,19 @@ def handle_test(event, context):
     print(">>> handle_test", event, context)
 
 
-root_switch.add_track(lambda event, context: True, event_type_switch)
+root_switch.add_track(lambda event, context: True, tie)
 
 
 def main():
     logging.basicConfig(level=logging.INFO)
     root_switch("test", Context())
+    print()
     root_switch("hello_world", Context())
+    print()
     root_switch(1, Context())
+    print()
     root_switch(None, Context())
+    print()
 
 
 if __name__ == '__main__':
