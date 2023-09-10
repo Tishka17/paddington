@@ -2,6 +2,7 @@ from logging import getLogger
 from typing import Any, Callable, Optional
 
 from .base import BaseSwitch
+from ..context import Context
 from ..errors import RouteNotFound
 from ..protocols import Switch
 
@@ -13,7 +14,7 @@ class SequentialSwitch(BaseSwitch):
         super().__init__(error_switch)
         self.routes: list[tuple[Callable, Callable]] = []
 
-    def add_route(self, predicate: Callable, route: Optional[Callable] = None):
+    def add_track(self, predicate: Callable, route: Optional[Callable] = None):
         if route:
             self.routes.append((predicate, route))
         else:
@@ -22,9 +23,8 @@ class SequentialSwitch(BaseSwitch):
 
             return decorator
 
-    def _dispatch(self, event: Any, context: Any):
+    def _dispatch(self, event: Any, context: Context):
         for predicate, route in self.routes:
-
             logger.debug(
                 "SequentialSwitch try predicate %s for route %s",
                 predicate, route,

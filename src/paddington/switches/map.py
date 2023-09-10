@@ -1,8 +1,9 @@
 from logging import getLogger
-from typing import Protocol, Any, Callable, Optional
+from typing import Any, Callable, Optional
 
-from ..errors import ErrorEvent, RouteNotFound
 from .base import BaseSwitch
+from ..context import Context
+from ..errors import ErrorEvent, RouteNotFound
 from ..protocols import Switch
 
 logger = getLogger(__name__)
@@ -16,7 +17,7 @@ class MapSwitch(BaseSwitch):
         self.routes: dict[Any, Callable] = {}
         self.getter = getter
 
-    def add_route(self, value: Any, route: Optional[Callable] = None):
+    def add_track(self, value: Any, route: Optional[Callable] = None):
         if route:
             self.routes[value] = route
         else:
@@ -25,7 +26,7 @@ class MapSwitch(BaseSwitch):
 
             return decorator
 
-    def _dispatch(self, event: Any, context: Any):
+    def _dispatch(self, event: Any, context: Context):
         key = self.getter(event, context)
         logger.debug("MapSwitch key retrieved: %s", key)
         try:
@@ -35,11 +36,11 @@ class MapSwitch(BaseSwitch):
         return route(event, context)
 
 
-def get_event_type(event, context):
+def get_event_type(event, context: Context):
     return type(event)
 
 
-def get_error_type(event, context):
+def get_error_type(event: ErrorEvent, context: Context):
     return type(event.exception)
 
 

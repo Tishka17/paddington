@@ -1,2 +1,4 @@
 class Context:
-    pass
+    def __init__(self):
+        self.data = {}
+        self.inner_middlewares = []
