@@ -1,2 +1,3 @@
 from .context import Context
-from .switch import SequentialSwitch, MapSwitch, RouteNotFound, PaddingtonError
+from .errors import PaddingtonError, ErrorEvent, RouteNotFound
+from .switch import SequentialSwitch, MapSwitch, TypeSwitch, ErrorTypeSwitch
