@@ -1,11 +1,21 @@
 from logging import getLogger
 from typing import Any, Optional
 
+from ..context import Context
 from ..errors import ErrorEvent, RouteNotFound
 from ..protocols import Switch
-from ..context import Context
 
 logger = getLogger(__name__)
+
+
+class OutputTrack:
+    def __init__(self, track: Switch):
+        self.track = track
+
+    def __call__(self, event: Any, context: Context):
+        for tie in context.ties:
+            tie(event, context)
+        self.track(event, context)
 
 
 class BaseSwitch:
@@ -24,7 +34,10 @@ class BaseSwitch:
             except RouteNotFound as rf:
                 raise e
 
+    def _wrap_output(self, switch: Switch):
+        if isinstance(switch, BaseSwitch):
+            return switch
+        return OutputTrack(switch)
+
     def _dispatch(self, event: Any, context: Context):
         raise NotImplementedError
-
-
