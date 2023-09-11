@@ -1,7 +1,7 @@
 from logging import getLogger
 from typing import Any, Callable, Optional
 
-from .base import BaseSwitch
+from .base import BaseSwitch, wrap_output
 from ..context import Context
 from ..errors import RouteNotFound
 from ..protocols import Track
@@ -16,7 +16,7 @@ class SequentialSwitch(BaseSwitch):
 
     def add_track(self, predicate: Callable, track: Optional[Callable] = None):
         if track:
-            track = self._wrap_output(track)
+            track = wrap_output(track)
             self.routes.append((predicate, track))
         else:
             def decorator(track: Callable):

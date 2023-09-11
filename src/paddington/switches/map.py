@@ -1,7 +1,7 @@
 from logging import getLogger
 from typing import Any, Callable, Optional
 
-from .base import BaseSwitch
+from .base import BaseSwitch, wrap_output
 from ..context import Context
 from ..errors import ErrorEvent, RouteNotFound
 from ..protocols import Track
@@ -19,7 +19,7 @@ class MapSwitch(BaseSwitch):
 
     def add_track(self, value: Any, track: Optional[Callable] = None):
         if track:
-            track = self._wrap_output(track)
+            track = wrap_output(track)
             self.routes[value] = track
         else:
             def decorator(track: Callable):

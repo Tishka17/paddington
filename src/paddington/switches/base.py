@@ -4,12 +4,18 @@ from typing import Any, Optional, Callable
 
 from ..context import Context
 from ..errors import ErrorEvent, RouteNotFound
-from ..protocols import Track
+from ..protocols import Track, Tie
 
 logger = getLogger(__name__)
 
 
-class OutputTrack:
+class InternalTrack(ABC):
+    @abstractmethod
+    def __call__(self, event: Any, context: Context):
+        raise NotImplementedError
+
+
+class OutputTrack(InternalTrack):
     def __init__(self, track: Track):
         self.track = track
 
@@ -18,12 +24,6 @@ class OutputTrack:
         for tie in reversed(context.ties):
             track = make_joint(track)(tie)
         track(event, context)
-
-
-class InternalTrack(ABC):
-    @abstractmethod
-    def __call__(self, event: Any, context: Context):
-        raise NotImplementedError
 
 
 class Joint(InternalTrack):
@@ -37,14 +37,20 @@ class Joint(InternalTrack):
         self.track(event, context)
 
 
-def make_joint(track: Track):
-    def make_joint_decorator(handler: Callable[[Track, Any, Context], Any]):
+def make_joint(track: Track) -> Callable[[Tie], Joint]:
+    def make_joint_decorator(handler: Tie) -> Joint:
         def joint_track(event: Any, context: Context):
             return handler(track, event, context)
 
         return Joint(joint_track)
 
     return make_joint_decorator
+
+
+def wrap_output(track: Track) -> InternalTrack:
+    if isinstance(track, InternalTrack):
+        return track
+    return OutputTrack(track)
 
 
 class BaseSwitch(InternalTrack):
@@ -63,11 +69,6 @@ class BaseSwitch(InternalTrack):
                 self.error_track(error_event, context)
             except RouteNotFound as rf:
                 raise e
-
-    def _wrap_output(self, track: Track):
-        if isinstance(track, InternalTrack):
-            return track
-        return OutputTrack(track)
 
     def _dispatch(self, event: Any, context: Context):
         raise NotImplementedError
