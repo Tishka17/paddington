@@ -1,5 +1,4 @@
-from .base import BaseSwitch
+from .base import BaseSwitch, Joint
 from .map import ErrorTypeSwitch, MapSwitch, TypeSwitch
 from .sequential import SequentialSwitch
-from .tie import Tie
-from .joint import Joint
+from .tiejoint import TieJoint

@@ -1,7 +1,5 @@
-from typing import Any, Optional
+from typing import Any
 from unittest.mock import Mock
-
-import pytest
 
 from paddington import Joint, Context, Track
 
@@ -12,15 +10,14 @@ class MyJoint(Joint):
             track: Track,
             pre: Track,
             post: Track,
-            error_switch: Optional[Track] = None,
     ) -> None:
-        super().__init__(track, error_switch)
+        super().__init__(track)
         self.pre = pre
         self.post = post
 
-    def _dispatch(self, event: Any, context: Context):
+    def __call__(self, event: Any, context: Context):
         self.pre(event, context)
-        super()._dispatch(event, context)
+        super().__call__(event, context)
         self.post(event, context)
 
 
@@ -34,18 +31,3 @@ def test_joint():
     pre.assert_called_once_with(1, c)
     handle.assert_called_once_with(1, c)
     post.assert_called_once_with(1, c)
-
-
-def test_joint_error():
-    pre = Mock()
-    handle = Mock(side_effect=ArithmeticError)
-    post = Mock()
-    error = Mock(side_effect=SyntaxError)
-    joint = MyJoint(handle, pre, post, error)
-    c = Context()
-    with pytest.raises(SyntaxError):
-        joint(1, c)
-    pre.assert_called_once_with(1, c)
-    handle.assert_called_once_with(1, c)
-    post.assert_not_called()
-    error.assert_called_once()

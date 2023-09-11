@@ -10,8 +10,8 @@ logger = getLogger(__name__)
 
 
 class SequentialSwitch(BaseSwitch):
-    def __init__(self, error_switch: Optional[Track] = None) -> None:
-        super().__init__(error_switch)
+    def __init__(self, error_track: Optional[Track] = None) -> None:
+        super().__init__(error_track)
         self.routes: list[tuple[Callable, Callable]] = []
 
     def add_track(self, predicate: Callable, track: Optional[Callable] = None):

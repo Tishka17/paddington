@@ -11,9 +11,9 @@ logger = getLogger(__name__)
 
 class MapSwitch(BaseSwitch):
     def __init__(
-            self, getter: Callable, error_switch: Optional[Track] = None,
+            self, getter: Callable, error_track: Optional[Track] = None,
     ) -> None:
-        super().__init__(error_switch)
+        super().__init__(error_track)
         self.routes: dict[Any, Callable] = {}
         self.getter = getter
 
@@ -46,10 +46,10 @@ def get_error_type(event: ErrorEvent, context: Context):
 
 
 class TypeSwitch(MapSwitch):
-    def __init__(self, error_switch: Optional[Track] = None) -> None:
-        super().__init__(get_event_type, error_switch)
+    def __init__(self, error_track: Optional[Track] = None) -> None:
+        super().__init__(get_event_type, error_track)
 
 
 class ErrorTypeSwitch(MapSwitch):
-    def __init__(self, error_switch: Optional[Track] = None) -> None:
-        super().__init__(get_error_type, error_switch)
+    def __init__(self, error_track: Optional[Track] = None) -> None:
+        super().__init__(get_error_type, error_track)

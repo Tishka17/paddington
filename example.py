@@ -1,8 +1,9 @@
 import logging
 
 from paddington import (
-    Context, ErrorTypeSwitch, TypeSwitch, RouteNotFound, SequentialSwitch, Tie,
+    Context, ErrorTypeSwitch, TypeSwitch, RouteNotFound, SequentialSwitch,
 )
+from paddington.switches.tiejoint import make_tie
 
 error_type_switch = ErrorTypeSwitch()
 
@@ -20,7 +21,7 @@ def handle_no_route(event, context):
     print("!!! handle_no_route", event, context)
 
 
-event_type_switch = TypeSwitch(error_switch=error_type_switch)
+event_type_switch = TypeSwitch(error_track=error_type_switch)
 
 
 @event_type_switch.add_track(int)
@@ -34,13 +35,13 @@ def handle_str(event, context):
     raise ValueError
 
 
-def inner_middleware(event, context):
+@make_tie(event_type_switch)
+def tie(track, event, context):
     print("    inner_middleware", event, context)
+    track(event, context)
 
 
-tie = Tie(event_type_switch, inner_middleware)
-
-root_switch = SequentialSwitch(error_switch=suppress_route_not_found)
+root_switch = SequentialSwitch(error_track=suppress_route_not_found)
 
 
 @root_switch.add_track(lambda event, context: event == "test")
