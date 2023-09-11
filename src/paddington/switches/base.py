@@ -15,7 +15,7 @@ class OutputTrack:
 
     def __call__(self, event: Any, context: Context):
         track = self.track
-        for tie in context.ties:
+        for tie in reversed(context.ties):
             track = make_joint(track)(tie)
         track(event, context)
 
