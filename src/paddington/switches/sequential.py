@@ -4,13 +4,13 @@ from typing import Any, Callable, Optional
 from .base import BaseSwitch
 from ..context import Context
 from ..errors import RouteNotFound
-from ..protocols import Switch
+from ..protocols import Track
 
 logger = getLogger(__name__)
 
 
 class SequentialSwitch(BaseSwitch):
-    def __init__(self, error_switch: Optional[Switch] = None) -> None:
+    def __init__(self, error_switch: Optional[Track] = None) -> None:
         super().__init__(error_switch)
         self.routes: list[tuple[Callable, Callable]] = []
 

@@ -4,14 +4,14 @@ from typing import Any, Callable, Optional
 from .base import BaseSwitch
 from ..context import Context
 from ..errors import ErrorEvent, RouteNotFound
-from ..protocols import Switch
+from ..protocols import Track
 
 logger = getLogger(__name__)
 
 
 class MapSwitch(BaseSwitch):
     def __init__(
-            self, getter: Callable, error_switch: Optional[Switch] = None,
+            self, getter: Callable, error_switch: Optional[Track] = None,
     ) -> None:
         super().__init__(error_switch)
         self.routes: dict[Any, Callable] = {}
@@ -46,10 +46,10 @@ def get_error_type(event: ErrorEvent, context: Context):
 
 
 class TypeSwitch(MapSwitch):
-    def __init__(self, error_switch: Optional[Switch] = None) -> None:
+    def __init__(self, error_switch: Optional[Track] = None) -> None:
         super().__init__(get_event_type, error_switch)
 
 
 class ErrorTypeSwitch(MapSwitch):
-    def __init__(self, error_switch: Optional[Switch] = None) -> None:
+    def __init__(self, error_switch: Optional[Track] = None) -> None:
         super().__init__(get_error_type, error_switch)
