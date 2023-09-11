@@ -1,3 +1,4 @@
+import functools
 from abc import ABC, abstractmethod
 from logging import getLogger
 from typing import Any, Optional, Callable
@@ -22,11 +23,17 @@ class OutputTrack(InternalTrack):
     def __call__(self, event: Any, context: Context):
         track = self.track
         for tie in reversed(context.ties):
-            track = make_joint(track)(tie)
+            track = make_internal_joint(track, tie)
         track(event, context)
 
 
-class Joint(InternalTrack):
+def wrap_output(track: Track) -> InternalTrack:
+    if isinstance(track, InternalTrack):
+        return track
+    return OutputTrack(track)
+
+
+class InternalJoint(InternalTrack):
     def __init__(
             self, track: Track,
     ) -> None:
@@ -37,20 +44,13 @@ class Joint(InternalTrack):
         self.track(event, context)
 
 
-def make_joint(track: Track) -> Callable[[Tie], Joint]:
-    def make_joint_decorator(handler: Tie) -> Joint:
-        def joint_track(event: Any, context: Context):
-            return handler(track, event, context)
+def make_internal_joint(
+        track: Track, handler: Tie,
+) -> InternalJoint:
+    def joint_track(event: Any, context: Context):
+        return handler(track, event, context)
 
-        return Joint(joint_track)
-
-    return make_joint_decorator
-
-
-def wrap_output(track: Track) -> InternalTrack:
-    if isinstance(track, InternalTrack):
-        return track
-    return OutputTrack(track)
+    return InternalJoint(joint_track)
 
 
 class BaseSwitch(InternalTrack):
@@ -67,7 +67,7 @@ class BaseSwitch(InternalTrack):
             error_event = ErrorEvent(e, event, self)
             try:
                 self.error_track(error_event, context)
-            except RouteNotFound as rf:
+            except RouteNotFound:
                 raise e
 
     def _dispatch(self, event: Any, context: Context):
