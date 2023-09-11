@@ -14,13 +14,13 @@ class SequentialSwitch(BaseSwitch):
         super().__init__(error_track)
         self.routes: list[tuple[Callable, Callable]] = []
 
-    def add_track(self, predicate: Callable, track: Optional[Callable] = None):
+    def track(self, predicate: Callable, track: Optional[Callable] = None):
         if track:
             track = wrap_output(track)
             self.routes.append((predicate, track))
         else:
             def decorator(track: Callable):
-                self.add_track(predicate, track)
+                self.track(predicate, track)
 
             return decorator
 

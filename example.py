@@ -8,7 +8,7 @@ from paddington.switches.tiejoint import make_tie
 error_type_switch = ErrorTypeSwitch()
 
 
-@error_type_switch.add_track(ValueError)
+@error_type_switch.track(ValueError)
 def handle_value_error(event, context):
     print("!!! handler_value_error", event, context)
 
@@ -16,7 +16,7 @@ def handle_value_error(event, context):
 suppress_route_not_found = ErrorTypeSwitch()
 
 
-@suppress_route_not_found.add_track(RouteNotFound)
+@suppress_route_not_found.track(RouteNotFound)
 def handle_no_route(event, context):
     print("!!! handle_no_route", event, context)
 
@@ -24,12 +24,12 @@ def handle_no_route(event, context):
 event_type_switch = TypeSwitch(error_track=error_type_switch)
 
 
-@event_type_switch.add_track(int)
+@event_type_switch.track(int)
 def handle_int(event, context):
     print(">>> handle_int", event, context)
 
 
-@event_type_switch.add_track(str)
+@event_type_switch.track(str)
 def handle_str(event, context):
     print(">>> handle_str", event, context)
     raise ValueError
@@ -44,12 +44,12 @@ def tie(track, event, context):
 root_switch = SequentialSwitch(error_track=suppress_route_not_found)
 
 
-@root_switch.add_track(lambda event, context: event == "test")
+@root_switch.track(lambda event, context: event == "test")
 def handle_test(event, context):
     print(">>> handle_test", event, context)
 
 
-root_switch.add_track(lambda event, context: True, tie)
+root_switch.track(lambda event, context: True, tie)
 
 
 def main():

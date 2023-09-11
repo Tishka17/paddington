@@ -17,13 +17,13 @@ class MapSwitch(BaseSwitch):
         self.routes: dict[Any, Callable] = {}
         self.getter = getter
 
-    def add_track(self, value: Any, track: Optional[Callable] = None):
+    def track(self, value: Any, track: Optional[Callable] = None):
         if track:
             track = wrap_output(track)
             self.routes[value] = track
         else:
             def decorator(track: Callable):
-                self.add_track(value, track)
+                self.track(value, track)
 
             return decorator
 
