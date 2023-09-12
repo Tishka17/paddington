@@ -24,7 +24,7 @@ class OutputTrack(InternalTrack):
         track = self.track
         for tie in reversed(context.ties):
             track = make_internal_joint(track, tie)
-        track(event, context)
+        return track(event, context)
 
 
 def wrap_output(track: Track) -> InternalTrack:
@@ -41,7 +41,7 @@ class InternalJoint(InternalTrack):
         self.track = track
 
     def __call__(self, event: Any, context: Context):
-        self.track(event, context)
+        return self.track(event, context)
 
 
 def make_internal_joint(
@@ -62,7 +62,7 @@ class BaseSwitch(InternalTrack):
             return self._dispatch(event, context)
 
         try:
-            self._dispatch(event, context)
+            return self._dispatch(event, context)
         except Exception as e:
             error_event = ErrorEvent(e, event, self)
             try:

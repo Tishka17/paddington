@@ -14,7 +14,7 @@ class TieJoint(BaseSwitch):
     def _dispatch(self, event: Any, context: Context):
         context.ties.append(self.tie)
         try:
-            self.track(event, context)
+            return self.track(event, context)
         finally:
             context.ties.pop()
 
