@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import os
-from typing import Callable, Optional
+from typing import Callable, Any
 
 from aiogram import Bot, MagicFilter, F
 from aiogram.types import Update, Message, CallbackQuery
@@ -14,22 +14,20 @@ def update_type(event: Update, context: Context) -> str:
 
 
 class FSwitch(SequentialSwitch):
-    def track(self, predicate: Callable | MagicFilter | None = None,
-              track: Optional[Callable] = None):
-        if predicate is None:
-            def real_predicate(event, context):
-                return True
-        elif isinstance(predicate, MagicFilter):
+
+    def _prepare_predicate(self, predicate: Any):
+        if isinstance(predicate, MagicFilter):
             def real_predicate(event, context):
                 return predicate.resolve(event.event)
-        else:
-            real_predicate = predicate
-        return super().track(real_predicate, track)
+
+            return real_predicate
+        return predicate
 
 
 router = MapSwitch(update_type)
 message_router = FSwitch()
-router.track("message", message_router)
+router["message"] = message_router
+
 callback_router = FSwitch()
 router.track("callback_query", callback_router)
 

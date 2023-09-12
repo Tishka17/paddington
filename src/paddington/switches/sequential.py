@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, List
 
 from .base import BaseSwitch, wrap_output
 from ..context import Context
@@ -12,27 +12,46 @@ logger = getLogger(__name__)
 class SequentialSwitch(BaseSwitch):
     def __init__(self, error_track: Optional[Track] = None) -> None:
         super().__init__(error_track)
-        self.routes: list[tuple[Callable, Callable]] = []
+        self.routes: list[tuple[List[Callable], Callable]] = []
 
-    def track(self, predicate: Callable, track: Optional[Callable] = None):
+    def _prepare_predicate(self, predicate: Any) -> Callable:
+        return predicate
+
+    def track(self, *predicates: Callable, track: Optional[Callable] = None):
+        predicates = [
+            self._prepare_predicate(predicate)
+            for predicate in predicates
+            if predicate is not None
+        ]
         if track:
             track = wrap_output(track)
-            self.routes.append((predicate, track))
+            self.routes.append((predicates, track))
         else:
             def decorator(track: Callable):
-                self.track(predicate, track)
+                return self.track(*predicates, track=track)
 
             return decorator
 
+    def _validate_predicates(
+            self, predicates, event: Any, context: Context,
+    ) -> bool:
+
+        for predicate in predicates:
+            if not predicate(event, context):
+                return False
+        return True
+
     def _dispatch(self, event: Any, context: Context):
-        for predicate, route in self.routes:
+        print(self.routes)
+        for predicates, route in self.routes:
             logger.debug(
-                "SequentialSwitch try predicate %s for route %s",
-                predicate, route,
+                "SequentialSwitch try predicates %s for route %s",
+                predicates, route,
             )
-            if predicate(event, context):
-                try:
-                    return route(event, context)
-                except RouteNotFound:
-                    pass
+            if not self._validate_predicates(predicates, event, context):
+                continue
+            try:
+                return route(event, context)
+            except RouteNotFound:
+                pass
         raise RouteNotFound
