@@ -11,10 +11,14 @@ logger = getLogger(__name__)
 
 class MapSwitch(BaseSwitch):
     def __init__(
-            self, getter: Callable, error_track: Optional[Track] = None,
+            self,
+            getter: Callable,
+            default_track: Optional[Track] = None,
+            error_track: Optional[Track] = None,
     ) -> None:
         super().__init__(error_track)
         self.routes: dict[Any, Callable] = {}
+        self.default_track = default_track
         self.getter = getter
 
     def track(self, value: Any, track: Optional[Callable] = None):
@@ -39,8 +43,15 @@ class MapSwitch(BaseSwitch):
         try:
             route = self.routes[key]
         except KeyError as e:
-            raise RouteNotFound from e
-        return route(event, context)
+            if not self.default_track:
+                raise RouteNotFound from e
+        else:
+            try:
+                return route(event, context)
+            except RouteNotFound:
+                if self.default_track:
+                    return self.default_track(event, context)
+                raise
 
 
 def get_event_type(event, context: Context):
