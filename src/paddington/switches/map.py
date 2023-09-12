@@ -13,12 +13,12 @@ class MapSwitch(BaseSwitch):
     def __init__(
             self,
             getter: Callable,
-            default_track: Optional[Track] = None,
+            default: Optional[Track] = None,
             error_track: Optional[Track] = None,
     ) -> None:
         super().__init__(error_track)
         self.routes: dict[Any, Callable] = {}
-        self.default_track = default_track
+        self.default = default
         self.getter = getter
 
     def track(self, value: Any, track: Optional[Callable] = None):
@@ -43,14 +43,14 @@ class MapSwitch(BaseSwitch):
         try:
             route = self.routes[key]
         except KeyError as e:
-            if not self.default_track:
+            if not self.default:
                 raise RouteNotFound from e
         else:
             try:
                 return route(event, context)
             except RouteNotFound:
-                if self.default_track:
-                    return self.default_track(event, context)
+                if self.default:
+                    return self.default(event, context)
                 raise
 
 

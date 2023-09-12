@@ -26,7 +26,7 @@ subrouter = UpdateSwitch()
 async def process_message(event: Message, bot):
     await event.answer("Your text: " + event.text)
 
-router.default_track.track(track=subrouter)
+router.default.track(track=subrouter)
 
 
 async def main():

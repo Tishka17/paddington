@@ -22,7 +22,7 @@ def update_type(event: Update, context: Context) -> str:
 
 
 class UpdateSwitch(MapSwitch):
-    default_track: FSwitch
+    default: FSwitch
 
     def __init__(self):
         super().__init__(update_type, FSwitch())
