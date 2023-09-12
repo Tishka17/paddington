@@ -22,6 +22,7 @@ class OutputTrack(InternalTrack):
 
     def __call__(self, event: Any, context: Context):
         track = self.track
+        context.output = self.track
         for tie in reversed(context.ties):
             track = make_internal_joint(track, tie)
         return track(event, context)
