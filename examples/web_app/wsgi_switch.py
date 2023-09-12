@@ -22,7 +22,7 @@ def method(*methods):
 
 class WsgiSwitch(SequentialSwitch):
     def track(
-            self, *predicates: Callable,
+            self, *predicates: Callable | str,
             methods: list[str] | None = None,
             track: Callable | None = None,
     ):

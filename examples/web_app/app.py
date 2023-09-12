@@ -9,7 +9,6 @@ router = WsgiSwitch()
 
 @router.track("/", methods=["GET"])
 def index(environ, context: WsgiContext):
-    """Simplest possible application object"""
     status = '200 OK'
     response_headers = [('Content-type', 'text/plain')]
     context.start_response(status, response_headers)
@@ -18,7 +17,6 @@ def index(environ, context: WsgiContext):
 
 @router.track("/users", methods=["GET"])
 def get_users(environ, context: WsgiContext):
-    """Simplest possible application object"""
     status = '200 OK'
     response_headers = [('Content-type', 'application/json')]
     context.start_response(status, response_headers)
@@ -27,7 +25,6 @@ def get_users(environ, context: WsgiContext):
 
 @router.track("/users", methods=["POST"])
 def add_user(environ, context: WsgiContext):
-    """Simplest possible application object"""
     status = '200 OK'
     response_headers = [('Content-type', 'application/json')]
     context.start_response(status, response_headers)
