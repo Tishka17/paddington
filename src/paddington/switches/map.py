@@ -27,6 +27,12 @@ class MapSwitch(BaseSwitch):
 
             return decorator
 
+    def __getitem__(self, item) -> Track:
+        return self.routes[item]
+
+    def __setitem__(self, value: Any, track: Track):
+        self.track(value, track)
+
     def _dispatch(self, event: Any, context: Context):
         key = self.getter(event, context)
         logger.debug("MapSwitch key retrieved: %s", key)
