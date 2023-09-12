@@ -12,18 +12,18 @@ router = UpdateSwitch()
 
 
 @router.message.track(F.text == "/start")
-async def process_message(event: Message, bot):
-    await event.answer("Started")
+async def process_message(event: Message, bot: Bot):
+    await bot.send_message(text="Started with bot", chat_id=event.chat.id)
 
 
 @router.callback_query.track()
-async def process_callback_query(event: CallbackQuery, bot):
+async def process_callback_query(event: CallbackQuery):
     await event.answer("Click found")
 
 
 subrouter = UpdateSwitch()
 @subrouter.message.track()
-async def process_message(event: Message, bot):
+async def process_message(event: Message):
     await event.answer("Your text: " + event.text)
 
 router.default.track(track=subrouter)

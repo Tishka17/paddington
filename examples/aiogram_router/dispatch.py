@@ -1,12 +1,14 @@
 from typing import Callable
 
+from aiogram.dispatcher.event.handler import CallableMixin
 from aiogram.types import Update
 
 from paddington import Context, TieJoint
 
 
 def unpack_event(track: Callable, event: Update, context: Context):
-    return track(event.event, **context.data)
+    c = CallableMixin(callback=track)
+    return c.call(event.event, **context.data)
 
 
 async def polling(dispatcher, bot):
