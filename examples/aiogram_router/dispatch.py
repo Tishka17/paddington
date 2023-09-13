@@ -3,17 +3,25 @@ from typing import Callable
 from aiogram.dispatcher.event.handler import CallableMixin
 from aiogram.types import Update
 
-from paddington import Context, TieJoint
+from paddington import Context, TieJoint, Track
 
 
-def unpack_event(track: Callable, event: Update, context: Context):
-    c = CallableMixin(callback=track)
-    return c.call(event.event, **context.data)
+class UnpackTie(TieJoint):
+    def __init__(self, track: Track):
+        super().__init__(track, self.tie)
+        self.callable_cache = {}
+
+    def tie(self, track: Callable, event: Update, context: Context):
+        patched_track = self.callable_cache.get(track)
+        if not patched_track:
+            patched_track = CallableMixin(callback=track).call
+            self.callable_cache[track] = patched_track
+        return patched_track(event.event, **context.data)
 
 
 async def polling(dispatcher, bot):
     offset = None
-    dispatcher = TieJoint(dispatcher, unpack_event)
+    dispatcher = UnpackTie(dispatcher)
 
     while True:
         updates = await bot.get_updates(
