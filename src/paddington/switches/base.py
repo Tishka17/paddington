@@ -19,10 +19,14 @@ class InternalTrack(ABC):
 class OutputTrack(InternalTrack):
     def __init__(self, track: Track):
         self.track = track
+        self.flags = {}
+
+    def _call_track(self, event, context: Context):
+        return self.track(event, context)
 
     def __call__(self, event: Any, context: Context):
-        track = self.track
-        context.output = self.track
+        track = self._call_track
+        context.output = self
         for tie in reversed(context.ties):
             track = make_internal_joint(track, tie)
         return track(event, context)
