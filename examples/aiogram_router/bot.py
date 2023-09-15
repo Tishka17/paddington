@@ -11,18 +11,18 @@ from dispatch import polling
 router = UpdateSwitch()
 
 
-@router.message.track(F.text == "/start")
+@router.message(F.text == "/start")
 async def process_message(event: Message, bot: Bot):
     await bot.send_message(text="Started with bot", chat_id=event.chat.id)
 
 
-@router.callback_query.track()
+@router.callback_query()
 async def process_callback_query(event: CallbackQuery):
     await event.answer("Click found")
 
 
 subrouter = UpdateSwitch()
-@subrouter.message.track()
+@subrouter.message()
 async def process_message(event: Message):
     await event.answer("Your text: " + event.text)
 

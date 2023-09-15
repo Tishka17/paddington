@@ -26,5 +26,7 @@ class UpdateSwitch(MapSwitch):
 
     def __init__(self):
         super().__init__(update_type, FSwitch())
-        self.message = self["message"] = FSwitch()
-        self.callback_query = self["callback_query"] = FSwitch()
+        self["message"] = FSwitch()
+        self.message = self["message"].track
+        self["callback_query"] = FSwitch()
+        self.callback_query = self["callback_query"].track
