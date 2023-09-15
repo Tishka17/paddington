@@ -17,14 +17,15 @@ class MapSwitch(BaseSwitch):
             error_track: Optional[Track] = None,
     ) -> None:
         super().__init__(error_track)
-        self.routes: dict[Any, Callable] = {}
+        self.tracks: dict[Any, Track] = {}
         self.default = default
         self.getter = getter
 
     def track(self, value: Any, track: Optional[Callable] = None):
         if track:
             track = wrap_output(track)
-            self.routes[value] = track
+            self.tracks[value] = track
+            return track
         else:
             def decorator(track: Callable):
                 self.track(value, track)
@@ -32,7 +33,7 @@ class MapSwitch(BaseSwitch):
             return decorator
 
     def __getitem__(self, item) -> Track:
-        return self.routes[item]
+        return self.tracks[item]
 
     def __setitem__(self, value: Any, track: Track):
         self.track(value, track)
@@ -41,7 +42,7 @@ class MapSwitch(BaseSwitch):
         key = self.getter(event, context)
         logger.debug("MapSwitch key retrieved: %s", key)
         try:
-            route = self.routes[key]
+            route = self.tracks[key]
         except KeyError as e:
             if self.default:
                 return self.default(event, context)

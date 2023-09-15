@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 class SequentialSwitch(BaseSwitch):
     def __init__(self, error_track: Optional[Track] = None) -> None:
         super().__init__(error_track)
-        self.routes: list[tuple[List[Callable], Callable]] = []
+        self.tracks: list[tuple[List[Callable], Callable]] = []
 
     def _prepare_predicate(self, predicate: Any) -> Callable:
         return predicate
@@ -25,7 +25,8 @@ class SequentialSwitch(BaseSwitch):
         ]
         if track:
             track = wrap_output(track)
-            self.routes.append((predicates, track))
+            self.tracks.append((predicates, track))
+            return track
         else:
             def decorator(track: Callable):
                 return self.track(*predicates, track=track)
@@ -41,15 +42,15 @@ class SequentialSwitch(BaseSwitch):
         return True
 
     def _dispatch(self, event: Any, context: Context):
-        for predicates, route in self.routes:
+        for predicates, track in self.tracks:
             logger.debug(
-                "SequentialSwitch try predicates %s for route %s",
-                predicates, route,
+                "SequentialSwitch try predicates %s for track %s",
+                predicates, track,
             )
             if not self._validate_predicates(predicates, event, context):
                 continue
             try:
-                return route(event, context)
+                return track(event, context)
             except RouteNotFound:
                 pass
         raise RouteNotFound
