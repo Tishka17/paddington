@@ -6,7 +6,7 @@ from paddington import (
     Joint, Track, ErrorEvent, ErrorTypeSwitch, RouteNotFound, SequentialSwitch,
 )
 from wsgi_app import App, WsgiContext
-from wsgi_rest_view import RestTie, HttpResponse
+from wsgi_rest_view import RestWheelSet, HttpResponse
 from wsgi_switch import WsgiSwitch
 
 error_router = ErrorTypeSwitch(default=SequentialSwitch())
@@ -88,4 +88,4 @@ def handle_any_error(
 
 
 router = ManagerJoint(router)
-app = App(RestTie(router))
+app = App(RestWheelSet(router))

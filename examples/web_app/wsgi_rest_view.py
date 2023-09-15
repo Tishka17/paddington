@@ -19,7 +19,7 @@ class HttpResponse(Generic[BodyT]):
     status: HTTPStatus = HTTPStatus.OK
 
 
-class RestTie(WheelSet):
+class RestWheelSet(WheelSet):
     def __init__(self, track: Track):
         super().__init__(track, self.tie)
         self.retort = Retort(recipe=[

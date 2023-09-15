@@ -4,7 +4,7 @@ from aiogram.types import Update
 from paddington import Context, Track, WheelSet
 
 
-class UnpackTie(WheelSet):
+class UnpackWheelSet(WheelSet):
     def __init__(self, track: Track):
         super().__init__(track, self.tie)
 
@@ -19,7 +19,7 @@ class UnpackTie(WheelSet):
 
 async def polling(dispatcher, bot):
     offset = None
-    dispatcher = UnpackTie(dispatcher)
+    dispatcher = UnpackWheelSet(dispatcher)
 
     while True:
         updates = await bot.get_updates(
