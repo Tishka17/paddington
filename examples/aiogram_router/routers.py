@@ -3,7 +3,7 @@ from typing import Any
 from aiogram import MagicFilter
 from aiogram.types import Update
 
-from paddington import SequentialSwitch, MapSwitch, Context
+from paddington import SequentialSwitch, MapSwitch, Context, Track
 
 
 class FSwitch(SequentialSwitch):
@@ -28,3 +28,6 @@ class UpdateSwitch(MapSwitch):
         super().__init__(update_type, FSwitch())
         self.message = self.track("message", FSwitch()).track
         self.callback_query = self.track("callback_query", FSwitch()).track
+
+    def include_router(self, track: Track):
+        self.default.track(track)

@@ -5,8 +5,8 @@ import os
 from aiogram import Bot, F
 from aiogram.types import Message, CallbackQuery
 
-from routers import UpdateSwitch
 from dispatch import polling
+from routers import UpdateSwitch
 
 router = UpdateSwitch()
 
@@ -22,11 +22,14 @@ async def process_callback_query(event: CallbackQuery):
 
 
 subrouter = UpdateSwitch()
+
+
 @subrouter.message()
 async def process_message(event: Message):
     await event.answer("Your text: " + event.text)
 
-router.default.track(track=subrouter)
+
+router.include_router(subrouter)
 
 
 async def main():
