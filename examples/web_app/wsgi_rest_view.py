@@ -2,9 +2,10 @@ import functools
 import json
 from dataclasses import dataclass
 from http import HTTPStatus
+from operator import itemgetter
 from typing import Any, TypeVar, Generic, get_type_hints, get_args
 
-from adaptix import Retort
+from adaptix import Retort, loader, dumper, name_mapping, Chain
 
 from wsgi_app import WsgiContext
 from paddington import WheelSet, Track
@@ -21,22 +22,24 @@ class HttpResponse(Generic[BodyT]):
 class RestTie(WheelSet):
     def __init__(self, track: Track):
         super().__init__(track, self.tie)
-        self.retort = Retort()
+        self.retort = Retort(recipe=[
+            name_mapping(HttpResponse, only=["body"]),
+            dumper(HttpResponse, itemgetter("body"), chain=Chain.LAST)
+        ])
 
     def _patch_track(self, track: Track):
         response_type = get_type_hints(track).get("return", HttpResponse[Any])
-        body_type = get_args(response_type)[0]
 
         @functools.wraps(track)
         def patched_track(event: any, context: WsgiContext):
             response = track(event, context)
+            body = self.retort.dump(response, response_type)
 
             response_headers = [('Content-type', 'application/json')]
             context.start_response(
                 f"{response.status.value} {response.status.phrase}",
                 response_headers,
             )
-            body = self.retort.dump(response.body, body_type)
             return [
                 json.dumps(body).encode("utf-8"),
             ]
