@@ -43,8 +43,9 @@ class MapSwitch(BaseSwitch):
         try:
             route = self.routes[key]
         except KeyError as e:
-            if not self.default:
-                raise RouteNotFound from e
+            if self.default:
+                return self.default(event, context)
+            raise RouteNotFound from e
         else:
             try:
                 return route(event, context)
@@ -63,10 +64,20 @@ def get_error_type(event: ErrorEvent, context: Context):
 
 
 class TypeSwitch(MapSwitch):
-    def __init__(self, error_track: Optional[Track] = None) -> None:
-        super().__init__(get_event_type, error_track)
+    def __init__(
+            self, error_track: Optional[Track] = None,
+            default: Optional[Track] = None,
+    ) -> None:
+        super().__init__(
+            get_error_type, error_track=error_track, default=default,
+        )
 
 
 class ErrorTypeSwitch(MapSwitch):
-    def __init__(self, error_track: Optional[Track] = None) -> None:
-        super().__init__(get_error_type, error_track)
+    def __init__(
+            self, error_track: Optional[Track] = None,
+            default: Optional[Track] = None,
+    ) -> None:
+        super().__init__(
+            get_error_type, error_track=error_track, default=default,
+        )

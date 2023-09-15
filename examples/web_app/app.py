@@ -1,17 +1,27 @@
+import logging
 from dataclasses import dataclass
+from http import HTTPStatus
 
-from paddington import Joint, Track
+from paddington import (
+    Joint, Track, ErrorEvent, ErrorTypeSwitch, RouteNotFound, SequentialSwitch,
+)
 from wsgi_app import App, WsgiContext
 from wsgi_rest_view import RestTie, HttpResponse
 from wsgi_switch import WsgiSwitch
 
-router = WsgiSwitch()
+error_router = ErrorTypeSwitch(default=SequentialSwitch())
+router = WsgiSwitch(error_track=error_router)
 
 
 @dataclass
 class User:
     id: int
     name: str
+
+
+@dataclass
+class Error:
+    error: str
 
 
 class UserManager:
@@ -53,6 +63,28 @@ def add_user(environ, context: WsgiContext) -> HttpResponse[User]:
 
     user_manager.users.append(user)
     return HttpResponse(body=user)
+
+
+@error_router.track(RouteNotFound)
+def handle_not_found_error(
+        environ: ErrorEvent, context: WsgiContext,
+) -> HttpResponse[Error]:
+    logging.error(f"Resource {environ.event['PATH_INFO']} not found")
+    return HttpResponse(
+        status=HTTPStatus.NOT_FOUND,
+        body=Error(error=f"Resource {environ.event['PATH_INFO']} not found"),
+    )
+
+
+@error_router.default.track()
+def handle_any_error(
+        environ: ErrorEvent, context: WsgiContext,
+) -> HttpResponse[Error]:
+    logging.error("Unhandled error in HTTP")
+    return HttpResponse(
+        status=HTTPStatus.INTERNAL_SERVER_ERROR,
+        body=Error(error=str(environ.exception)),
+    )
 
 
 router = ManagerJoint(router)

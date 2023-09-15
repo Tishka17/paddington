@@ -30,6 +30,7 @@ class RestTie(WheelSet):
         @functools.wraps(track)
         def patched_track(event: any, context: WsgiContext):
             response = track(event, context)
+
             response_headers = [('Content-type', 'application/json')]
             context.start_response(
                 f"{response.status.value} {response.status.phrase}",

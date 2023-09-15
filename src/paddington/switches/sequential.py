@@ -35,7 +35,6 @@ class SequentialSwitch(BaseSwitch):
     def _validate_predicates(
             self, predicates, event: Any, context: Context,
     ) -> bool:
-
         for predicate in predicates:
             if not predicate(event, context):
                 return False

@@ -1,7 +1,6 @@
-import functools
 from abc import ABC, abstractmethod
 from logging import getLogger
-from typing import Any, Optional, Callable
+from typing import Any, Optional
 
 from ..context import Context
 from ..errors import ErrorEvent, RouteNotFound
@@ -69,9 +68,9 @@ class BaseSwitch(InternalTrack):
         try:
             return self._dispatch(event, context)
         except Exception as e:
-            error_event = ErrorEvent(e, event, self)
+            error_event = ErrorEvent(exception=e, event=event, router=self)
             try:
-                self.error_track(error_event, context)
+                return self.error_track(error_event, context)
             except RouteNotFound:
                 raise e
 
