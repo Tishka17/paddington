@@ -1,5 +1,5 @@
-Aiogram routing example
-===========================
+Telegram bot routing example
+=================================
 
 Paddington objects:
 * `FSwitch` is a variant of `SequentialSwitch` which allows to use `F`-filters
