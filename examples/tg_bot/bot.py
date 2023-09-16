@@ -3,10 +3,10 @@ import os
 
 from magic_filter import F
 
-from bot_object import TgClient
-from dispatch import polling
-from routers import UpdateSwitch
-from tg_types import Message, CallbackQuery
+from bot_framework.client import TgClient
+from bot_framework.dispatch import polling
+from bot_framework.routers import UpdateSwitch
+from bot_framework.types import Message, CallbackQuery
 
 router = UpdateSwitch()
 

@@ -5,9 +5,9 @@ from http import HTTPStatus
 from paddington import (
     Joint, Track, ErrorEvent, ErrorTypeSwitch, RouteNotFound, SequentialSwitch,
 )
-from wsgi_app import App, WsgiContext
-from wsgi_rest_view import RestWheelSet, HttpResponse
-from wsgi_switch import WsgiSwitch
+from web_framework.app import App, WsgiContext
+from web_framework.rest_view import RestWheelSet, HttpResponse
+from web_framework.wsgi_switch import WsgiSwitch
 
 error_router = ErrorTypeSwitch(default=SequentialSwitch())
 router = WsgiSwitch(error_track=error_router)

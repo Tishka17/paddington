@@ -3,7 +3,7 @@ from typing import Any
 from magic_filter import MagicFilter
 
 from paddington import SequentialSwitch, MapSwitch, Context, Track
-from tg_types import Update
+from .types import Update
 
 
 class FSwitch(SequentialSwitch):

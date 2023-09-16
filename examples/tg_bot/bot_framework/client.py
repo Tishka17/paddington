@@ -8,7 +8,7 @@ from dataclass_rest.client_protocol import FactoryProtocol
 from dataclass_rest.http.requests import RequestsClient, RequestsMethod
 from requests import Session, Response
 
-from tg_types import Update, Message
+from .types import Update, Message
 
 
 class TgError(Exception):

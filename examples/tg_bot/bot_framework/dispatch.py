@@ -2,7 +2,7 @@ import inspect
 from typing import Dict, Any
 
 from paddington import Context, Track, WheelSet
-from tg_types import Update
+from .types import Update
 
 
 class UnpackWheelSet(WheelSet):

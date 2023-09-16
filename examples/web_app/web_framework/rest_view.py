@@ -3,12 +3,12 @@ import json
 from dataclasses import dataclass
 from http import HTTPStatus
 from operator import itemgetter
-from typing import Any, TypeVar, Generic, get_type_hints, get_args
+from typing import Any, TypeVar, Generic, get_type_hints
 
-from adaptix import Retort, loader, dumper, name_mapping, Chain
+from adaptix import Retort, dumper, name_mapping, Chain
 
-from wsgi_app import WsgiContext
 from paddington import WheelSet, Track
+from .app import WsgiContext
 
 BodyT = TypeVar("BodyT")
 
