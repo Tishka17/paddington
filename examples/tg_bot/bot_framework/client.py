@@ -21,7 +21,8 @@ class TgMethod(RequestsMethod):
         json_body = super()._response_body(response)
         if not (ok := json_body.get("ok")):
             raise TgError(
-                (json_body.get("descrption"), json_body.get("error_code")))
+                (json_body.get("description"), json_body.get("error_code")),
+            )
         return json_body.get("result")
 
 
